@@ -3,7 +3,6 @@ function New-CIPPAlertTemplate {
         [Parameter(Mandatory = $true)]
         $Data,
         [Parameter(Mandatory = $true)]
-        [ValidateSet('html', 'json')]
         $Format,
         $LocationInfo,
         $ActionResults
@@ -18,7 +17,7 @@ function New-CIPPAlertTemplate {
     $AfterButtonText = ''
     $RuleTable = ''
     $Table = ''
-
+    $LocationInfo = $LocationInfo | Select-Object *, -excludeproperty Etag, PartitionKey, RowKey, TimeStamp
     switch ($Data.Operation) {
         'New-InboxRule' {
             $Title = "$($TenantFilter) - New Rule Detected for $($data.UserId)"
