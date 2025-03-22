@@ -13,12 +13,13 @@ function Invoke-CIPPStandardDisableAdditionalStorageProviders {
         CAT
             Exchange Standards
         TAG
-            "lowimpact"
             "CIS"
             "exo_storageproviderrestricted"
         ADDEDCOMPONENT
         IMPACT
             Low Impact
+        ADDEDDATE
+            2024-01-17
         POWERSHELLEQUIVALENT
             Get-OwaMailboxPolicy \| Set-OwaMailboxPolicy -AdditionalStorageProvidersEnabled \$False
         RECOMMENDEDBY
@@ -26,7 +27,7 @@ function Invoke-CIPPStandardDisableAdditionalStorageProviders {
         UPDATECOMMENTBLOCK
             Run the Tools\Update-StandardsComments.ps1 script to update this comment block
     .LINK
-        https://docs.cipp.app/user-documentation/tenant/standards/edit-standards
+        https://docs.cipp.app/user-documentation/tenant/standards/list-standards/exchange-standards#low-impact
     #>
 
     param($Tenant, $Settings)
@@ -53,13 +54,15 @@ function Invoke-CIPPStandardDisableAdditionalStorageProviders {
 
     if ($Settings.alert -eq $true) {
         if ($AdditionalStorageProvidersState.AdditionalStorageProvidersAvailable) {
-            Write-LogMessage -API 'Standards' -tenant $tenant -message 'OWA additional storage providers are enabled' -sev Alert
+            Write-StandardsAlert -message 'OWA additional storage providers are enabled' -object $AdditionalStorageProvidersState -tenant $tenant -standardName 'DisableAdditionalStorageProviders' -standardId $Settings.standardId
+            Write-LogMessage -API 'Standards' -tenant $tenant -message 'OWA additional storage providers are enabled' -sev Info
         } else {
             Write-LogMessage -API 'Standards' -tenant $tenant -message 'OWA additional storage providers are disabled' -sev Info
         }
     }
 
     if ($Settings.report -eq $true) {
+        Set-CIPPStandardsCompareField -FieldName 'standards.AdditionalStorageProvidersEnabled' -FieldValue $AdditionalStorageProvidersState.AdditionalStorageProvidersEnabled -TenantFilter $Tenant
         Add-CIPPBPAField -FieldName 'AdditionalStorageProvidersEnabled' -FieldValue $AdditionalStorageProvidersState.AdditionalStorageProvidersEnabled -StoreAs bool -Tenant $tenant
     }
 }
